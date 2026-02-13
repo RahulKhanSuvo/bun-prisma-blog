@@ -1,4 +1,5 @@
 import type { Post } from "../../../generated/prisma/client"
+import type { PostWhereInput } from "../../../generated/prisma/models"
 import { prisma } from "../../utility/db"
 
 const createPost = async (data: Omit<Post, "id" | "createdAt" | "updateAt" | "authorId">, authorId: string) => {
@@ -10,7 +11,27 @@ const createPost = async (data: Omit<Post, "id" | "createdAt" | "updateAt" | "au
         }
     })
 }
-const getAllPost = async () => {
-    return await prisma.post.findMany()
-}
+const getAllPost = async (search?: string, tags?: string[]) => {
+    const andCondition: PostWhereInput[] = [];
+
+    if (search) {
+        andCondition.push({
+            OR: [
+                { title: { contains: search, mode: "insensitive" } },
+                { content: { contains: search, mode: "insensitive" } },
+            ],
+        });
+    }
+
+    if (tags?.length) {
+        andCondition.push({
+            tags: { hasEvery: tags },
+        });
+    }
+
+    const where = andCondition.length ? { AND: andCondition } : undefined;
+
+    return prisma.post.findMany({ where });
+};
+
 export const PostService = { createPost, getAllPost }

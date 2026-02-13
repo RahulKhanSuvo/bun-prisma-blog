@@ -20,21 +20,25 @@ const createPost = async (req: Request, res: Response) => {
 }
 const getAllPost = async (req: Request, res: Response) => {
     try {
-        const result = await PostService.getAllPost()
+        const search = req.query.search as string | undefined;
+        const tags = req.query.tags ? (req.query.tags as string).split(",") : [];
+
+        const result = await PostService.getAllPost(search, tags);
+
         return res.status(200).json({
             status: true,
-            message: "Get all post successfully",
-            data: result
-        })
+            message: "Get all posts successfully",
+            data: result,
+        });
     } catch (error) {
-        const err = error as Error;
+        console.error(error);
         return res.status(500).json({
             status: false,
-            message: "Failed to get",
-            error: err.message
+            message: "Failed to get posts",
         });
     }
-}
+};
+
 export const postController = {
     createPost, getAllPost
 }
