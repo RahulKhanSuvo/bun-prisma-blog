@@ -54,10 +54,12 @@ export const authGard = (...role: UseRole[]) => {
             next()
         } catch (error) {
             console.error(error)
+            next(error)
             return res.status(500).json({
                 success: false,
                 message: "Authentication failed"
             })
+
         }
     }
 }

@@ -3,7 +3,7 @@ import { PostService } from "./post.service";
 
 const createPost = async (req: Request, res: Response) => {
     try {
-        const result = await PostService.createPost(req.body)
+        const result = await PostService.createPost(req.body, req.user?.id as string)
         return res.status(201).json({
             status: true,
             message: "Post create successfully",
